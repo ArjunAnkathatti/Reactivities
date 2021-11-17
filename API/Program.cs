@@ -14,7 +14,7 @@ namespace API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
             using var scope = host.Services.CreateScope();
@@ -24,7 +24,10 @@ namespace API
             try {
                 // use service locator pattern to 
                 var context = services.GetRequiredService<DataContext>();
-                context.Database.Migrate();
+                await context.Database.MigrateAsync();
+
+                // seed data if it doesn't exists already
+                await Seed.SeedData(context);
             } catch(Exception ex)
             {
                 var logger = services.GetRequiredService<ILogger<Program>>();
@@ -32,7 +35,7 @@ namespace API
             }
 
             // to start the application
-            host.Run();
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
