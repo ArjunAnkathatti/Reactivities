@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Domain;
+using FluentValidation;
 using MediatR;
 using Persistence;
 
@@ -17,6 +18,14 @@ namespace Application.Activities
             public Activity Activity { get; set; }
         }
 
+        public class Validator : AbstractValidator<Command>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
+            }
+        }
+        
         public class Handler : IRequestHandler<Command>
         {
             private DataContext _context;
